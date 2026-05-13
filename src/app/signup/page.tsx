@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 const SignupPage = () => {
   return (
@@ -70,7 +70,7 @@ const SignupPage = () => {
           <p className="text-sm text-gray-600">
             Already have an account?
             <a
-              href="#"
+              href="/signin"
               className="text-blue-600 font-semibold hover:underline ml-1"
             >
               Log in
