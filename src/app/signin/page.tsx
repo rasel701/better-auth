@@ -1,10 +1,41 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "motion/react";
 import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
+import { redirect, useParams, useRouter } from "next/navigation";
 
 const SignInPage = () => {
+  const [user, setUser] = useState({ email: "", password: "" });
+  const router = useRouter();
+  const handleUserSignin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { data, error } = await authClient.signIn.email(
+      {
+        email: user.email,
+        password: user.password,
+      },
+      {
+        onSuccess: (cxt) => {
+          cxt.data.user?.role === "user"
+            ? router.push("/user_dashboard")
+            : router.push("/admin_dashboard");
+        },
+        onError: (cxt) => {
+          alert(`Singin error:`);
+        },
+      },
+    );
+
+    console.log(data);
+    console.log(error);
+  };
+
+  console.log(user);
+  const param = useParams();
+  console.log(param);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-indigo-100 via-white to-blue-100 p-4 mt-10">
       {/* Login Card */}
@@ -23,7 +54,7 @@ const SignInPage = () => {
           </p>
         </div>
 
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleUserSignin}>
           {/* Email Field */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2 ml-1">
@@ -32,7 +63,9 @@ const SignInPage = () => {
             <input
               type="email"
               placeholder="name@company.com"
-              className="w-full px-5 py-3.5 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all bg-white/80 placeholder:text-gray-400"
+              value={user.email}
+              onChange={(e) => setUser({ ...user, email: e.target.value })}
+              className="w-full px-5 text-gray-800 py-3.5 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all bg-white/80 placeholder:text-gray-400"
             />
           </div>
 
@@ -52,7 +85,9 @@ const SignInPage = () => {
             <input
               type="password"
               placeholder="••••••••"
-              className="w-full px-5 py-3.5 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all bg-white/80 placeholder:text-gray-400"
+              className="w-full px-5 text-gray-800 py-3.5 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all bg-white/80 placeholder:text-gray-400"
+              value={user.password}
+              onChange={(e) => setUser({ ...user, password: e.target.value })}
             />
           </div>
 

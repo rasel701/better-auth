@@ -2,9 +2,14 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
+import Logout from "./Logout";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const { data: session } = authClient.useSession();
+  console.log("session:", session);
 
   return (
     <nav className="fixed w-full z-50 top-0 start-0 border-b border-white/20 bg-white/70 backdrop-blur-md">
@@ -87,6 +92,22 @@ const Navbar = () => {
                 Contact
               </Link>
             </li>
+
+            {session?.session.token && (
+              <>
+                <li>
+                  <Link
+                    href={`${session?.user?.role === "user" ? "user_dashboard" : "admin_dashboard"}`}
+                    className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-600 md:p-0 transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Logout />
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>

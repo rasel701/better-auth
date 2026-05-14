@@ -1,9 +1,49 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "motion/react";
+import { authClient } from "@/lib/auth-client";
+import { redirect } from "next/navigation";
+
+interface IUser {
+  name: string;
+  email: string;
+  password: string;
+}
 
 const SignupPage = () => {
+  const [user, setUser] = useState<IUser>({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { data, error } = await authClient.signUp.email(
+      {
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        role: "user",
+      } as any,
+      {
+        onRequest: (ctx) => {
+          console.log("request: ", ctx);
+        },
+        onSuccess: (ctx) => {
+          console.log(ctx);
+          setUser({ name: "", email: "", password: "" });
+          redirect("/signin");
+        },
+        onError: (ctx) => {
+          alert(`Error:${ctx}`);
+        },
+      },
+    );
+    console.log(data);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       {/* Main Card */}
@@ -18,7 +58,7 @@ const SignupPage = () => {
           <p className="text-gray-500 mt-2">Join us and start your journey</p>
         </div>
 
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleFormSubmit}>
           {/* Full Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -27,7 +67,9 @@ const SignupPage = () => {
             <input
               type="text"
               placeholder="John Doe"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition-all bg-white/50"
+              value={user.name}
+              onChange={(e) => setUser({ ...user, name: e.target.value })}
+              className="w-full px-4 py-3 text-gray-800 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition-all bg-white/50"
             />
           </div>
 
@@ -39,7 +81,9 @@ const SignupPage = () => {
             <input
               type="email"
               placeholder="example@mail.com"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition-all bg-white/50"
+              value={user.email}
+              onChange={(e) => setUser({ ...user, email: e.target.value })}
+              className="w-full px-4 text-gray-800 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition-all bg-white/50"
             />
           </div>
 
@@ -51,7 +95,9 @@ const SignupPage = () => {
             <input
               type="password"
               placeholder="••••••••"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition-all bg-white/50"
+              value={user.password}
+              onChange={(e) => setUser({ ...user, password: e.target.value })}
+              className="w-full px-4 py-3 text-gray-800 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition-all bg-white/50"
             />
           </div>
 
